@@ -15,10 +15,8 @@ def files_to_filter():
 
 def filters_for_file(fname):
     d = {}
-    filters = filters_from_passdb(fname)
     for f in filters_from_passdb(fname):
-        key, secret = f.split(':', 1)
-        d[secret] = key
+        add_filter_rule(d, f)
     return d
 
 
@@ -28,6 +26,18 @@ def filters_from_passdb(rel_path):
     out = sub.Popen(cmd, stdout=sub.PIPE).communicate()[0]
     filters = sanitize_popen_output(out)
     return filters.splitlines()
+
+
+def add_filter_rule(filter_rules, rule):
+    if current_hook() == "pre-commit":
+        cipher, secret = rule.split(':', 1)
+    elif current_hook() == "post-commit":
+        secret, cipher = rule.split(':', 1)
+    filter_rules[secret] = cipher
+
+
+def current_hook():
+    return os.path.basename(__file__)
 
 
 def filter_file(fname, filters):
@@ -67,5 +77,5 @@ if __name__ == "__main__":
         fname = fname.strip()
         filters = filters_for_file(fname)
         filter_file(fname, filters)
-        if file_is_staged(fname):
+        if current_hook() == "pre-commit" and file_is_staged(fname):
             stage_file(fname)
