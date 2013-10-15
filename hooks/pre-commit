@@ -31,7 +31,7 @@ def filters_from_passdb(rel_path):
 def add_filter_rule(filter_rules, rule):
     if current_hook() == "pre-commit":
         cipher, secret = rule.split(':', 1)
-    elif current_hook() == "post-commit":
+    elif current_hook() in ["post-commit", "post-merge"]:
         secret, cipher = rule.split(':', 1)
     filter_rules[secret] = cipher
 
