@@ -1,0 +1,34 @@
+#!/bin/sh
+
+hooks_to_install="pre-commit post-commit post-merge"
+
+pwfilter_dir=$(pwd)
+pwfilter_hook="$pwfilter_dir/pwfilter-hook"
+pwfilter_git="$pwfilter_dir/.git"
+
+# there is no installation routine if pwfilter is not a submodule itself
+if [ ! -f "$pwfilter_git" ]; then
+    echo "githooks_pwfilter is meant to be used as a submodule!"
+    exit 1
+fi
+
+# find root directory of superproject
+cd `dirname "$pwfilter_dir"`
+superproject_root=$(git rev-parse --show-toplevel)
+superproject_git="$superproject_root/.git"
+
+# find hooks directory in git repository
+if [ -d "$superproject_git" ]; then
+    hookdir="$superproject_git"/hooks
+# if superproject is a submodule itself read .git to find actual gitdir
+elif [ -f "$superproject_git" ]; then
+    gitdir="$(awk -Fgitdir:\  '{print $NF}' $superproject_git)"
+    hookdir="$superproject_root/$gitdir/hooks"
+fi    
+
+# install hooks into hooks directory
+if [ -d "$hookdir" ]; then
+    for h in $hooks_to_install; do
+        install "$pwfilter_hook" "$hookdir/$h"
+    done
+fi
