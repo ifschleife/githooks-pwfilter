@@ -3,7 +3,7 @@
 hooks_to_install="pre-commit post-commit post-merge"
 
 pwfilter_dir=$(pwd)
-pwfilter_hook="$pwfilter_dir/pwfilter-hook"
+pwfilter_hook="$pwfilter_dir/pwfilter-hook.py"
 pwfilter_git="$pwfilter_dir/.git"
 
 # there is no installation routine if pwfilter is not a submodule itself
