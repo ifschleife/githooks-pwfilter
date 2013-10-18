@@ -50,7 +50,7 @@ def filter_file(fname, filters):
 
 
 def filter_line(line, filters):
-    for token, subst in filters.iteritems():
+    for token, subst in filters.items():
         line = line.replace(token, subst)
     return line
 
